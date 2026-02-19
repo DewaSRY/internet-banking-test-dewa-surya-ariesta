@@ -17,7 +17,7 @@ export default defineNuxtPlugin(() => {
     onResponseError: ({ response }) => {
       if (response.status === 401) {
         useCookie("access_token").value = null;
-        navigateTo("/login");
+        navigateTo("/auth/signin");
         return;
       }
     },

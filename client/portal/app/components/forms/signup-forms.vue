@@ -122,7 +122,7 @@ async function onSubmit(event: FormSubmitEvent<SignupForm>) {
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       });
-      accessToken.value = data.value.refreshToken;
+      accessToken.value = data.value.accessToken;
     }
 
 
