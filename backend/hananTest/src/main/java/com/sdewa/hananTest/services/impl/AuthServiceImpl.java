@@ -60,16 +60,13 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public JwtResponse signup(SignupRequest signupRequest) {
 
-        if (userRepository.existsByUsername(signupRequest.getUsername())) {
-            throw new RuntimeException("Error: Username is already taken!");
-        }
         
         if (userRepository.existsByEmail(signupRequest.getEmail())) {
             throw new RuntimeException("Error: Email is already in use!");
         }
         
         User user = User.builder()
-                .username(signupRequest.getUsername())
+                .name(signupRequest.getUsername())
                 .email(signupRequest.getEmail())
                 .password(passwordEncoder.encode(signupRequest.getPassword()))
                 .build();

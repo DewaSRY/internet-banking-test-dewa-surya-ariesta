@@ -17,7 +17,15 @@ import lombok.NoArgsConstructor;
 public class CommonResponse<T> {
     
     private String message;
+
     @Builder.Default
     private List<T> data = new ArrayList<>();
     private PaginateMetaData metaData;
+
+    @SuppressWarnings("rawtypes")
+    public static CommonResponse of(String message) {
+        return CommonResponse.builder()
+                .message(message)
+                .build();
+    }
 }

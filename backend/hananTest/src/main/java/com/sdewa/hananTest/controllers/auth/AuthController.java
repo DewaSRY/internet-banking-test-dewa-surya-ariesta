@@ -4,9 +4,9 @@ import com.sdewa.hananTest.dtos.request.LoginRequest;
 import com.sdewa.hananTest.dtos.request.RefreshTokenRequest;
 import com.sdewa.hananTest.dtos.request.SignupRequest;
 import com.sdewa.hananTest.dtos.response.JwtResponse;
-import com.sdewa.hananTest.dtos.response.MessageResponse;
+import com.sdewa.hananTest.dtos.response.CommonResponse;
 import com.sdewa.hananTest.entity.User;
-import com.sdewa.hananTest.services.impl.AuthServiceImpl;
+import com.sdewa.hananTest.services.AuthService;
 
 
 
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
     
-    private final AuthServiceImpl authService;
+    private final AuthService authService;
     
     @PostMapping("/signup")
     public ResponseEntity<JwtResponse> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
@@ -41,15 +41,16 @@ public class AuthController {
         return ResponseEntity.ok(jwtResponse);
     }
     
+    @SuppressWarnings("rawtypes")
     @DeleteMapping("/logout")
-    public ResponseEntity<MessageResponse> logoutUser(Authentication authentication) {
+    public ResponseEntity<CommonResponse> logoutUser(Authentication authentication) {
 
         if (authentication != null && authentication.getPrincipal() instanceof User user) {
             authService.logout(user.getId());
-            return ResponseEntity.ok(MessageResponse.of("Logged out successfully!"));
+            return ResponseEntity.ok(CommonResponse.of("Logged out successfully!"));
         }
 
         return ResponseEntity.badRequest()
-                .body(MessageResponse.of("User not authenticated"));
+                .body(CommonResponse.of("User not authenticated"));
     }
 }

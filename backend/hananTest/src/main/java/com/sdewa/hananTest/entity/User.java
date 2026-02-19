@@ -25,7 +25,7 @@ public class User implements UserDetails {
     private Long id;
     
     @Column(nullable = false, length = 50)
-    private String username;
+    private String name;
     
     @Column(nullable = false, unique = true, length = 100)
     private String email;
@@ -73,5 +73,10 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 }

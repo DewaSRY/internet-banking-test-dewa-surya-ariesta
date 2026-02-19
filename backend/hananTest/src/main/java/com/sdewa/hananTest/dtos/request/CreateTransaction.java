@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateTransaction {
-
     private String email;
     private TransactionEnum transactionEnum;
     private BigDecimal amount;
