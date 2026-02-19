@@ -53,14 +53,20 @@ public class TransactionCRUDImpl implements TransactionCRUDService {
                                 .orElse(null);
                     }
 
+                    TransactionEnum transactionType = transaction.getTransactionType();
+                    if (transactionType.equals(TransactionEnum.TRANSFER)
+                            && userTo.getEmail().equals(user.getEmail())) {
+                        transactionType = TransactionEnum.RECEIVE;
+                    }
+
                     return TransactionHistoryRecord.builder()
-                            .transactionEnum(transaction.getTransactionType())
+                            .transactionEnum(transactionType)
                             .amount(transaction.getAmount())
                             .userFrom(userFrom != null ? UserProfileDto.builder()
                                     .username(userFrom.getUsername())
                                     .email(userFrom.getEmail())
                                     .build() : null)
-                            .userTO(userTo != null ? UserProfileDto.builder()
+                            .userTo(userTo != null ? UserProfileDto.builder()
                                     .username(userTo.getUsername())
                                     .email(userTo.getEmail())
                                     .build() : null)

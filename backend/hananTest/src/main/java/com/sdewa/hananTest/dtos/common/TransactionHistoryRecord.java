@@ -18,6 +18,6 @@ public class TransactionHistoryRecord {
     private TransactionEnum transactionEnum;
     private BigDecimal amount;
     private UserProfileDto userFrom;
-    private UserProfileDto userTO;
+    private UserProfileDto userTo;
     private LocalDateTime createdAt;
 }

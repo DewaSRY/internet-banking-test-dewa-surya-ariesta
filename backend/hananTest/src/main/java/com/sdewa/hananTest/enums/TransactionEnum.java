@@ -4,4 +4,5 @@ public enum TransactionEnum {
     DEPOSIT,
     TRANSFER,
     WITHDRAW,
+    RECEIVE
 }
