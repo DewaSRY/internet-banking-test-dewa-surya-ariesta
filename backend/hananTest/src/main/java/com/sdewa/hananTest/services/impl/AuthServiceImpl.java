@@ -1,5 +1,6 @@
 package com.sdewa.hananTest.services.impl;
 
+import com.sdewa.hananTest.dtos.common.UserProfileDto;
 import com.sdewa.hananTest.dtos.request.LoginRequest;
 import com.sdewa.hananTest.dtos.request.SignupRequest;
 import com.sdewa.hananTest.dtos.response.JwtResponse;
@@ -48,6 +49,10 @@ public class AuthServiceImpl implements AuthService {
         return JwtResponse.builder()
                 .accessToken(jwt)
                 .refreshToken(refreshToken.getToken())
+                .userProfileDto(UserProfileDto.builder()
+                        .email(user.getEmail())
+                        .username(user.getUsername())
+                        .build())
                 .build();
     }
     
@@ -85,6 +90,10 @@ public class AuthServiceImpl implements AuthService {
         return JwtResponse.builder()
                 .accessToken(jwt)
                 .refreshToken(refreshToken.getToken())
+                .userProfileDto(UserProfileDto.builder()
+                        .email(user.getEmail())
+                        .username(user.getUsername())
+                        .build())
                 .build();
     }
 
@@ -100,6 +109,10 @@ public class AuthServiceImpl implements AuthService {
                     return JwtResponse.builder()
                             .accessToken(jwt)
                             .refreshToken(refreshToken)
+                            .userProfileDto(UserProfileDto.builder()
+                                    .email(user.getEmail())
+                                    .username(user.getUsername())
+                                    .build())
                             .build();
                 })
                 .orElseThrow(() -> new RuntimeException("Refresh token not found!"));
