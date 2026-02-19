@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { CommonResponseSchema } from "./common";
-import { TransactionHistoryRecordSchema } from "#shared/common/transaction";
+import { TransactionHistoryRecordSchema } from "~~/shared/types/common/transaction";
 
 export const TransactionProfileResponseSchema = z.object({
   total: z.number(),
