@@ -35,9 +35,7 @@
         />
       </div>
     </UForm>
-    <div class="w-full p-4">
-      <RefreshButton />
-    </div>
+
   </div>
 </template>
 
@@ -51,7 +49,6 @@ import type { FormSubmitEvent, FormError, Form } from "@nuxt/ui";
 import { API_AUTH_SIGNIN } from "#shared/constants";
 import type {  JwtResponse , SigninRequest} from "#shared/types";
 import { SignupFormSchema } from "#shared/types";
-import RefreshButton from "../ui/refresh-button.vue";
 
 const { $api } = useNuxtApp();
 
