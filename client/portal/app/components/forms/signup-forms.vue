@@ -109,7 +109,7 @@ async function onSubmit(event: FormSubmitEvent<SignupForm>) {
       username: event.data.username,
     };
 
-    const { data } = await useAsyncData("users", () =>
+    const { data } = await useAsyncData(API_AUTH_SIGNUP, () =>
       $api<JwtResponse>(API_AUTH_SIGNUP, {
         method: "POST",
         body: body,
@@ -125,14 +125,14 @@ async function onSubmit(event: FormSubmitEvent<SignupForm>) {
       accessToken.value = data.value.refreshToken;
     }
 
-    // handle navigate
 
     toast.add({
       title: "Success!",
-      description: "Your account has been created. Welcome to ArusKu!",
+      description: "Your account has been created. Welcome",
       color: "success",
       icon: "i-heroicons-check-circle",
     });
+     await navigateTo("/user");
   } catch (error) {
     toast.add({
       title: "Sign Up Failed",

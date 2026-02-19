@@ -11,7 +11,15 @@ const links = [
     {
       label: "Home",
       icon: "i-lucide-house",
-      to: "/guest/dashboard",
+      to: "/user",
+      onSelect: () => {
+        open.value = false;
+      },
+    },
+       {
+      label: "Home",
+      icon: "i-lucide-house",
+      to: "/user/transaction",
       onSelect: () => {
         open.value = false;
       },

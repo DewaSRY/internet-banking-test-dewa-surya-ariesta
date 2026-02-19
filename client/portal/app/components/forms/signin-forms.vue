@@ -6,8 +6,10 @@
     />
 
     <UForm
-      :schema="SignupFormSchema"
+      ref="formRef"
+      :schema="SigninRequestSchema"
       :state="formState"
+      :validate-on="['blur', 'change', 'input']"
       class="space-y-4"
       @submit="onSubmit"
     >
@@ -35,28 +37,24 @@
         />
       </div>
     </UForm>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import PasswordInputUi from "$components/ui/password-input-ui.vue";
-import EmailInputUi from "$components/ui/email-input-ui.vue";
-import SubmitButtonUi from "$components/ui/submit-button-ui.vue";
-import FormHeaderUi from "$components/ui/form-header-ui.vue";
+import EmailInputUi from "../ui/email-input-ui.vue";
+import SubmitButtonUi from "../ui/submit-button-ui.vue";
+import FormHeaderUi from "../ui/form-header-ui.vue";
+import PasswordInputUi from "../ui/password-input-ui.vue";
 import type { FormSubmitEvent, FormError, Form } from "@nuxt/ui";
 
 import { API_AUTH_SIGNIN } from "#shared/constants";
-import type {  JwtResponse , SigninRequest} from "#shared/types";
-import { SignupFormSchema } from "#shared/types";
+import type { JwtResponse, SigninRequest } from "#shared/types";
+import { SigninRequestSchema } from "#shared/types";
 
 const { $api } = useNuxtApp();
 
 const defaultState: Partial<SigninRequest> = {};
-const formState = reactive<Partial<SigninRequest>>({
-  password: undefined,
-  email: undefined,
-});
+const formState = reactive<Partial<SigninRequest>>({});
 
 const toast = useToast();
 const isLoading = ref(false);
@@ -66,10 +64,12 @@ const isFormInvalid = computed<boolean>(() => {
   if (!formRef.value?.dirty) {
     return false;
   }
+  console.log(formRef.value.errors)
   return (formRef.value?.errors?.length ?? 0) > 0;
 });
 
 async function onSubmit(event: FormSubmitEvent<SigninRequest>) {
+  console.log(event);
   isLoading.value = true;
 
   try {
@@ -78,7 +78,7 @@ async function onSubmit(event: FormSubmitEvent<SigninRequest>) {
       password: event.data.password,
     };
 
-  const { data } = await useAsyncData("users", () =>
+    const { data } = await useAsyncData(API_AUTH_SIGNIN, () =>
       $api<JwtResponse>(API_AUTH_SIGNIN, {
         method: "POST",
         body: body,
@@ -87,7 +87,7 @@ async function onSubmit(event: FormSubmitEvent<SigninRequest>) {
 
     if (data.value) {
       const accessToken = useCookie<string>("access_token", {
-        maxAge: 60 * 60 * 24, 
+        maxAge: 60 * 60 * 24,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       });
@@ -97,14 +97,13 @@ async function onSubmit(event: FormSubmitEvent<SigninRequest>) {
 
     toast.add({
       title: "Success!",
-      description: "Welcome back to ArusKu!",
+      description: "Welcome back",
       color: "success",
       icon: "i-heroicons-check-circle",
     });
 
-     // handle navigate
-
-
+    // handle navigate
+    await navigateTo("/user");
   } catch (error) {
     toast.add({
       title: "Sign In Failed",
