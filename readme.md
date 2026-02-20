@@ -2,6 +2,8 @@
 
 Author : Dewa Surya Ariesta
 
+![thumbnail](/doc/images/thumbnail-test.png)
+
 ## Available account 
 
 | Account Name | email             | password    |
@@ -17,4 +19,16 @@ cd backend/hananTest
 
 ./mvnw spring-boot:run // or mvn spring-boot:run
 
+```
+
+### run the frontend 
+
+```bash 
+cd client/portal
+
+## install dependency 
+npm install 
+
+## run the application 
+npm run dev
 ```
