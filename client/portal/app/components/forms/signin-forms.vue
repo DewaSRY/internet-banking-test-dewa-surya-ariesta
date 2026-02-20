@@ -64,7 +64,6 @@ const isFormInvalid = computed<boolean>(() => {
   if (!formRef.value?.dirty) {
     return false;
   }
-  console.log(formRef.value.errors)
   return (formRef.value?.errors?.length ?? 0) > 0;
 });
 

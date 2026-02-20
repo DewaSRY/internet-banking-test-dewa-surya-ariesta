@@ -16,9 +16,9 @@ const links = [
         open.value = false;
       },
     },
-       {
-      label: "Home",
-      icon: "i-lucide-house",
+    {
+      label: "Transaction Record",
+      icon: "i-lucide-receipt-text",
       to: "/user/transaction",
       onSelect: () => {
         open.value = false;
