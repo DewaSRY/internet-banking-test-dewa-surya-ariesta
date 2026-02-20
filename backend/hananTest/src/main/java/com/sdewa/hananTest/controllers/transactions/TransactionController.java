@@ -23,7 +23,7 @@ public class TransactionController {
     private final TransactionProfileService transactionProfileService;
 
     @SuppressWarnings("rawtypes")
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<CommonResponse> createTransaction(
             @Valid @RequestBody CreateTransaction createPayload,
             @AuthenticationPrincipal User user) {

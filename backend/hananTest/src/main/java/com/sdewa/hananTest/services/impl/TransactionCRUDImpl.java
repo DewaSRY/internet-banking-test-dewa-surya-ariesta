@@ -9,6 +9,7 @@ import com.sdewa.hananTest.dtos.response.CommonResponse;
 import com.sdewa.hananTest.entity.Transaction;
 import com.sdewa.hananTest.entity.User;
 import com.sdewa.hananTest.enums.TransactionEnum;
+import com.sdewa.hananTest.exception.CustomBadRequestException;
 import com.sdewa.hananTest.repository.TransactionRepository;
 import com.sdewa.hananTest.repository.UserRepository;
 import com.sdewa.hananTest.services.TransactionCRUDService;
@@ -19,6 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.http.HttpStatus;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,15 +34,15 @@ public class TransactionCRUDImpl implements TransactionCRUDService {
         private final UserRepository userRepository;
 
         @Override
-                        @Transactional(readOnly = true)
+        @Transactional(readOnly = true)
         public CommonResponse<TransactionHistoryRecord> getTransactionRecord(User user, CommonFilters commonFilters) {
                 Pageable pageable = PageRequest.of(
                                 commonFilters.getPage() - 1,
                                 commonFilters.getLimit());
 
                 Page<Transaction> transactionPage = transactionRepository.findByUserIdOrderByCreatedAtDesc(
-                                                user.getId(),
-                                pageable);
+                                user.getId(),
+                                                pageable);
 
                 List<TransactionHistoryRecord> records = transactionPage.getContent().stream()
                                 .map(transaction -> {
@@ -91,11 +95,13 @@ public class TransactionCRUDImpl implements TransactionCRUDService {
         @SuppressWarnings("rawtypes")
         public CommonResponse createTransaction(User user, CreateTransaction createTransaction) {
                 if (createTransaction.getTransactionEnum() == null) {
-                        throw new RuntimeException("Transaction type is required");
+                        throw new CustomBadRequestException("Transaction type is required",
+                                        HttpStatus.BAD_REQUEST.value());
                 }
 
                 if (createTransaction.getAmount() == null || createTransaction.getAmount().signum() <= 0) {
-                        throw new RuntimeException("Amount must be greater than zero");
+                        throw new CustomBadRequestException("Amount must be greater than zero",
+                                        HttpStatus.UNPROCESSABLE_CONTENT.value());
                 }
 
                 Transaction transaction;
@@ -110,6 +116,13 @@ public class TransactionCRUDImpl implements TransactionCRUDService {
                                 break;
 
                         case WITHDRAW:
+                                BigDecimal currentBalance = transactionRepository.getCurrentBalance(user.getId());
+
+                                if (currentBalance.subtract(createTransaction.getAmount())
+                                                .compareTo(BigDecimal.ZERO) < 0) {
+                                        throw new CustomBadRequestException("Insufficient balance",
+                                                        HttpStatus.CONFLICT.value());
+                                }
                                 transaction = Transaction.builder()
                                                 .accountFromId(user.getId())
                                                 .accountToId(null)
@@ -120,16 +133,18 @@ public class TransactionCRUDImpl implements TransactionCRUDService {
 
                         case TRANSFER:
                                 if (createTransaction.getEmail() == null || createTransaction.getEmail().isEmpty()) {
-                                        throw new RuntimeException("Recipient email is required for transfer");
+                                        throw new CustomBadRequestException("Recipient email is required for transfer",
+                                                        HttpStatus.BAD_REQUEST.value());
                                 }
 
                                 if (user.getEmail().equals(createTransaction.getEmail())) {
-                                        throw new RuntimeException("Cannot sending to the same account");
+                                        throw new CustomBadRequestException("Cannot sending to the same account", 0);
                                 }
                                 User recipientUser = userRepository.findByEmail(createTransaction.getEmail())
-                                                .orElseThrow(() -> new RuntimeException(
+                                                .orElseThrow(() -> new CustomBadRequestException(
                                                                 "Recipient not found with email: "
-                                                                                + createTransaction.getEmail()));
+                                                                                + createTransaction.getEmail(),
+                                                                HttpStatus.NOT_FOUND.value()));
 
                                 transaction = Transaction.builder()
                                                 .accountFromId(user.getId())
@@ -139,7 +154,8 @@ public class TransactionCRUDImpl implements TransactionCRUDService {
                                                 .build();
                                 break;
                         default:
-                                throw new RuntimeException("Invalid transaction type");
+                                throw new CustomBadRequestException("Invalid transaction type",
+                                                HttpStatus.BAD_REQUEST.value());
                 }
                 transactionRepository.save(transaction);
                 return CommonResponse.builder()

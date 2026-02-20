@@ -13,13 +13,28 @@ import java.math.BigDecimal;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    
+
     @Query("SELECT t FROM Transaction t WHERE t.accountFromId = :userId OR t.accountToId = :userId ORDER BY t.createdAt DESC")
     Page<Transaction> findByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId, Pageable pageable);
-    
+
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.accountFromId = :userId AND t.transactionType = :transactionType")
-    BigDecimal sumAmountByUserIdAndTransactionType(@Param("userId") Long userId, @Param("transactionType") TransactionEnum transactionType);
-    
+    BigDecimal sumAmountByUserIdAndTransactionType(@Param("userId") Long userId,
+            @Param("transactionType") TransactionEnum transactionType);
+
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.accountToId = :userId AND t.transactionType = :transactionType")
-    BigDecimal sumReceivedAmountByUserId(@Param("userId") Long userId, @Param("transactionType") TransactionEnum transactionType);
+    BigDecimal sumReceivedAmountByUserId(@Param("userId") Long userId,
+            @Param("transactionType") TransactionEnum transactionType);
+
+    @Query("""
+               SELECT COALESCE(SUM(
+                CASE
+                    WHEN t.accountFromId = :userId THEN t.amount
+                    WHEN t.accountToId = :userId THEN -t.amount
+                END
+            ), 0)
+            FROM Transaction t
+            WHERE t.accountFromId = :userId
+               OR t.accountToId = :userId
+            """)
+    BigDecimal getCurrentBalance(@Param("userId") Long userId);
 }

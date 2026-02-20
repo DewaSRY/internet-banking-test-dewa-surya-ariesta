@@ -18,69 +18,69 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AppBootStrapData implements CommandLineRunner {
 
-    private final AuthService authService;
-    private final TransactionCRUDService transactionCRUDService;
-    private final UserRepository userRepository;
+        private final AuthService authService;
+        private final TransactionCRUDService transactionCRUDService;
+        private final UserRepository userRepository;
 
-    @Override
-    public void run(String... args) throws Exception {
-        var userOneResponse = authService.signup(SignupRequest.builder()
-                .email("user1@example.com")
-                .password("password123")
-                .username("user 1")
-                .build());
+        @Override
+        public void run(String... args) throws Exception {
+                var userOneResponse = authService.signup(SignupRequest.builder()
+                                .email("user1@example.com")
+                                .password("password123")
+                                .username("user 1")
+                                .build());
 
-        var userTwoResponse = authService.signup(SignupRequest.builder()
-                .email("user2@example.com")
-                .password("password123")
-                .username("user 2")
-                .build());
+                var userTwoResponse = authService.signup(SignupRequest.builder()
+                                .email("user2@example.com")
+                                .password("password123")
+                                .username("user 2")
+                                .build());
 
-        var userOne = userOneResponse.getUserProfileDto();
-        var userTow = userTwoResponse.getUserProfileDto();
+                var userOne = userOneResponse.getUserProfileDto();
+                var userTow = userTwoResponse.getUserProfileDto();
 
-        var userOneModelMock = userRepository.findByEmail(userOne.getEmail())
-                .orElseThrow(() -> new RuntimeException("user email not found"));
+                var userOneModelMock = userRepository.findByEmail(userOne.getEmail())
+                                .orElseThrow(() -> new RuntimeException("user email not found"));
 
-        var userTwoModelMock = userRepository.findByEmail(userTow.getEmail())
-                .orElseThrow(() -> new RuntimeException("user email not found"));
+                var userTwoModelMock = userRepository.findByEmail(userTow.getEmail())
+                                .orElseThrow(() -> new RuntimeException("user email not found"));
 
-        transactionCRUDService.createTransaction(
-                userOneModelMock,
-                CreateTransaction.builder()
-                        .amount(new BigDecimal("1000000"))
-                        .transactionEnum(TransactionEnum.DEPOSIT)
-                        .build());
+                transactionCRUDService.createTransaction(
+                                userOneModelMock,
+                                CreateTransaction.builder()
+                                                .amount(new BigDecimal("1000000"))
+                                                .transactionEnum(TransactionEnum.DEPOSIT)
+                                                .build());
 
-        transactionCRUDService.createTransaction(
-                userTwoModelMock,
-                CreateTransaction.builder()
-                        .amount(new BigDecimal("1500000"))
-                        .transactionEnum(TransactionEnum.DEPOSIT)
-                        .build());
+                transactionCRUDService.createTransaction(
+                                userTwoModelMock,
+                                CreateTransaction.builder()
+                                                .amount(new BigDecimal("1500000"))
+                                                .transactionEnum(TransactionEnum.DEPOSIT)
+                                                .build());
 
-        transactionCRUDService.createTransaction(
-                userOneModelMock,
-                CreateTransaction.builder()
-                        .amount(new BigDecimal("100000"))
-                        .transactionEnum(TransactionEnum.TRANSFER)
-                        .email(userTwoModelMock.getEmail())
-                        .build());
+                transactionCRUDService.createTransaction(
+                                userOneModelMock,
+                                CreateTransaction.builder()
+                                                .amount(new BigDecimal("10000"))
+                                                .transactionEnum(TransactionEnum.TRANSFER)
+                                                .email(userTwoModelMock.getEmail())
+                                                .build());
 
-        transactionCRUDService.createTransaction(
-                userTwoModelMock,
-                CreateTransaction.builder()
-                        .amount(new BigDecimal("300000"))
-                        .transactionEnum(TransactionEnum.TRANSFER)
-                        .email(userOneModelMock.getEmail())
-                        .build());
+                transactionCRUDService.createTransaction(
+                                userTwoModelMock,
+                                CreateTransaction.builder()
+                                                .amount(new BigDecimal("30000"))
+                                                .transactionEnum(TransactionEnum.TRANSFER)
+                                                .email(userOneModelMock.getEmail())
+                                                .build());
 
-        transactionCRUDService.createTransaction(
-                userTwoModelMock,
-                CreateTransaction.builder()
-                        .amount(new BigDecimal("300000"))
-                        .transactionEnum(TransactionEnum.WITHDRAW)
-                        .build());
-    }
+                transactionCRUDService.createTransaction(
+                                userTwoModelMock,
+                                CreateTransaction.builder()
+                                                .amount(new BigDecimal("30000"))
+                                                .transactionEnum(TransactionEnum.WITHDRAW)
+                                                .build());
+        }
 
 }
