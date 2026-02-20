@@ -29,51 +29,50 @@ const badgeColor: globalThis.ComputedRef<
 <template>
   <UCard class="w-full">
     <div class="grid grid-cols-5 gap-6 items-center">
-      <!-- LEFT SIDE -->
       <div class="col-span-2 space-y-4">
-        <!-- Transaction Type -->
         <UBadge :color="badgeColor" variant="soft" size="sm">
           {{ props.transactionRecord.transactionEnum }}
         </UBadge>
 
-        <!-- From User -->
-        <div class="flex items-center gap-3">
-          <UAvatar :alt="props.transactionRecord.userFrom.username" size="md" />
-
-          <div>
+        <div class="grid xl:grid-cols-2 gap-2">
+          <div class="flex items-center gap-3">
+            <UAvatar
+              :alt="props.transactionRecord.userFrom.username"
+              size="md"
+            />
             <div>
-              <UBadge color="neutral" variant="outline" size="sm">
-                From
-              </UBadge>
+              <div>
+                <UBadge color="neutral" variant="outline" size="sm">
+                  From
+                </UBadge>
+              </div>
+              <p class="font-semibold">
+                {{ props.transactionRecord.userFrom.username }}
+              </p>
+              <p class="text-sm text-gray-500">
+                {{ props.transactionRecord.userFrom.email }}
+              </p>
             </div>
-            <p class="font-semibold">
-              {{ props.transactionRecord.userFrom.username }}
-            </p>
-            <p class="text-sm text-gray-500">
-              {{ props.transactionRecord.userFrom.email }}
-            </p>
           </div>
-        </div>
 
-        <!-- To User -->
-        <div
-          v-if="props.transactionRecord.userTo"
-          class="flex items-center gap-3"
-        >
-          <UAvatar :alt="props.transactionRecord.userTo.username" size="md" />
-          <div>
-            <UBadge color="neutral" variant="outline" size="sm"> TO </UBadge>
-            <p class="font-semibold">
-              {{ props.transactionRecord.userTo.username }}
-            </p>
-            <p class="text-sm text-gray-500">
-              {{ props.transactionRecord.userTo.email }}
-            </p>
+          <div
+            v-if="props.transactionRecord.userTo"
+            class="flex items-center gap-3"
+          >
+            <UAvatar :alt="props.transactionRecord.userTo.username" size="md" />
+            <div>
+              <UBadge color="neutral" variant="outline" size="sm"> TO </UBadge>
+              <p class="font-semibold">
+                {{ props.transactionRecord.userTo.username }}
+              </p>
+              <p class="text-sm text-gray-500">
+                {{ props.transactionRecord.userTo.email }}
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT SIDE -->
       <div class="col-span-3 space-y-4 text-right">
         <div>
           <p class="text-sm text-gray-500">Date</p>

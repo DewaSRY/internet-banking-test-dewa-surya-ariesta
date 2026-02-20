@@ -9,12 +9,21 @@ import TransactionHistoryTable from "~/components/tabeldata/transaction-history-
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
-        <template #right> </template>
+        <template #right>
+          <UButton
+            label="New Transaction"
+            icon="i-lucide-plus"
+            to="/user/transaction/new"
+            as="NuxtLink"
+          />
+        </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
-      <TransactionHistoryTable />
+      <UContainer>
+        <TransactionHistoryTable />
+      </UContainer>
     </template>
   </UDashboardPanel>
 </template>

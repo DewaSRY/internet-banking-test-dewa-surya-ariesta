@@ -20,16 +20,9 @@ defineExpose({
 </script>
 
 <template>
-  <section class="w-full max-w-2xl">
-    <div>
-        <h2 class="text-primary text-2xl mb-2">
-            Transaction History
-        </h2>
+  <template v-for="t in tableData" :transaction-record="t">
+    <div class="my-2">
+      <TransactionHistoryRecord :transaction-record="t" />
     </div>
-    <template v-for="t in tableData" :transaction-record="t">
-      <div class="my-2">
-        <TransactionHistoryRecord :transaction-record="t" />
-      </div>
-    </template>
-  </section>
+  </template>
 </template>

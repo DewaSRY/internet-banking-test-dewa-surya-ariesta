@@ -89,6 +89,8 @@ await fetchProfile();
       </template>
     </UDashboardSidebar>
     <UDashboardSearch :groups="groups" />
+
     <slot />
+    
   </UDashboardGroup>
 </template>

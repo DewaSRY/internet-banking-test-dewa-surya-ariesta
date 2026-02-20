@@ -8,3 +8,9 @@ export const CommonResponseSchema = <T extends  z.ZodTypeAny>(schema: T) => {
     data: z.array(schema),
   });
 };
+
+export const CommonResponseMessageSchema = z.object({
+  messages: z.string(),
+});
+
+export type CommonResponseMessage = z.infer<typeof CommonResponseMessageSchema>;

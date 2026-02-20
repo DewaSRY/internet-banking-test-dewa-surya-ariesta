@@ -7,7 +7,7 @@
   >
     <UInput
       :model-value="modelValue"
-      :type="type"
+      type="number"
       :placeholder="placeholder"
       :size="size"
       :icon="icon"
@@ -21,7 +21,7 @@
 <script setup lang="ts">
 
 interface Props {
-  modelValue?: string
+  modelValue?: number
   label?: string
   name?: string
   placeholder?: string
@@ -30,11 +30,10 @@ interface Props {
   size?: 'sm' | 'md' | 'lg' | 'xl'
   icon?: string
   help?: string
-  type?: "text" | "number"
 }
 
 withDefaults(defineProps<Props>(), {
-  modelValue: '',
+  modelValue: 0,
   label: 'Full Name',
   name: 'name',
   placeholder: 'Enter your full name',
@@ -43,10 +42,9 @@ withDefaults(defineProps<Props>(), {
   size: 'xl',
   icon: 'i-heroicons-user',
   help: '',
-  type: "text"
 })
 
 defineEmits<{
-  'update:modelValue': [value: string]
+  'update:modelValue': [value: number | undefined]
 }>()
 </script>
