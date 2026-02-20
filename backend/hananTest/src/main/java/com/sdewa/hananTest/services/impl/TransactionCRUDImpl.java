@@ -26,126 +26,125 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TransactionCRUDImpl implements TransactionCRUDService {
 
-    private final TransactionRepository transactionRepository;
-    private final UserRepository userRepository;
+        private final TransactionRepository transactionRepository;
+        private final UserRepository userRepository;
 
-    @Override
-    @Transactional(readOnly = true)
-    public CommonResponse<TransactionHistoryRecord> getTransactionRecord(User user, CommonFilters commonFilters) {
-        Pageable pageable = PageRequest.of(
-                commonFilters.getPage() - 1,
-                commonFilters.getLimit()
-        );
+        @Override
+                        @Transactional(readOnly = true)
+        public CommonResponse<TransactionHistoryRecord> getTransactionRecord(User user, CommonFilters commonFilters) {
+                Pageable pageable = PageRequest.of(
+                                commonFilters.getPage() - 1,
+                                commonFilters.getLimit());
 
-        Page<Transaction> transactionPage = transactionRepository.findByUserIdOrderByCreatedAtDesc(
-                user.getId(),
-                pageable
-        );
+                Page<Transaction> transactionPage = transactionRepository.findByUserIdOrderByCreatedAtDesc(
+                                                user.getId(),
+                                pageable);
 
-        List<TransactionHistoryRecord> records = transactionPage.getContent().stream()
-                .map(transaction -> {
-                    User userFrom = userRepository.findById(transaction.getAccountFromId())
-                            .orElse(null);
-                    
-                    User userTo = null;
-                    if (transaction.getAccountToId() != null) {
-                        userTo = userRepository.findById(transaction.getAccountToId())
-                                .orElse(null);
-                    }
+                List<TransactionHistoryRecord> records = transactionPage.getContent().stream()
+                                .map(transaction -> {
+                                        User userFrom = userRepository.findById(transaction.getAccountFromId())
+                                                        .orElse(null);
 
-                    TransactionEnum transactionType = transaction.getTransactionType();
-                    if (transactionType.equals(TransactionEnum.TRANSFER)
-                            && userTo.getEmail().equals(user.getEmail())) {
-                        transactionType = TransactionEnum.RECEIVE;
-                    }
+                                        User userTo = null;
+                                        if (transaction.getAccountToId() != null) {
+                                                userTo = userRepository.findById(transaction.getAccountToId())
+                                                                .orElse(null);
+                                        }
 
-                    return TransactionHistoryRecord.builder()
-                            .transactionEnum(transactionType)
-                            .amount(transaction.getAmount())
-                            .userFrom(userFrom != null ? UserProfileDto.builder()
-                                    .username(userFrom.getUsername())
-                                    .email(userFrom.getEmail())
-                                    .build() : null)
-                            .userTo(userTo != null ? UserProfileDto.builder()
-                                    .username(userTo.getUsername())
-                                    .email(userTo.getEmail())
-                                    .build() : null)
-                            .createdAt(transaction.getCreatedAt())
-                            .build();
-                })
-                .collect(Collectors.toList());
+                                        TransactionEnum transactionType = transaction.getTransactionType();
+                                        if (transactionType.equals(TransactionEnum.TRANSFER)
+                                                        && userTo.getEmail().equals(user.getEmail())) {
+                                                transactionType = TransactionEnum.RECEIVE;
+                                        }
 
-        PaginateMetaData metaData = PaginateMetaData.builder()
-                .total((int) transactionPage.getTotalElements())
-                .page(commonFilters.getPage())
-                .limit(commonFilters.getLimit())
-                .build();
+                                        return TransactionHistoryRecord.builder()
+                                                        .transactionEnum(transactionType)
+                                                        .amount(transaction.getAmount())
+                                                        .userFrom(userFrom != null ? UserProfileDto.builder()
+                                                                        .username(userFrom.getName())
+                                                                        .email(userFrom.getEmail())
+                                                                        .build() : null)
+                                                        .userTo(userTo != null ? UserProfileDto.builder()
+                                                                        .username(userTo.getName())
+                                                                        .email(userTo.getEmail())
+                                                                        .build() : null)
+                                                        .createdAt(transaction.getCreatedAt())
+                                                        .build();
+                                })
+                                .collect(Collectors.toList());
 
-        return CommonResponse.<TransactionHistoryRecord>builder()
-                .message("Transaction records retrieved successfully")
-                .data(records)
-                .metaData(metaData)
-                .build();
-    }
+                PaginateMetaData metaData = PaginateMetaData.builder()
+                                .total((int) transactionPage.getTotalElements())
+                                .page(commonFilters.getPage())
+                                .limit(commonFilters.getLimit())
+                                .build();
 
-    @Override
-    @Transactional
-    @SuppressWarnings("rawtypes")
-    public CommonResponse createTransaction(User user,CreateTransaction createTransaction) {
-        if (createTransaction.getTransactionEnum() == null) {
-            throw new RuntimeException("Transaction type is required");
+                return CommonResponse.<TransactionHistoryRecord>builder()
+                                .message("Transaction records retrieved successfully")
+                                .data(records)
+                                .metaData(metaData)
+                                .build();
         }
 
-        if (createTransaction.getAmount() == null || createTransaction.getAmount().signum() <= 0) {
-            throw new RuntimeException("Amount must be greater than zero");
-        }
-
-
-        Transaction transaction;
-        switch (createTransaction.getTransactionEnum()) {
-            case DEPOSIT:
-                transaction = Transaction.builder()
-                        .accountFromId(user.getId())
-                        .accountToId(null)
-                        .transactionType(TransactionEnum.DEPOSIT)
-                        .amount(createTransaction.getAmount())
-                        .build();
-                break;
-
-            case WITHDRAW:
-                transaction = Transaction.builder()
-                        .accountFromId(user.getId())
-                        .accountToId(null)
-                        .transactionType(TransactionEnum.WITHDRAW)
-                        .amount(createTransaction.getAmount())
-                        .build();
-                break;
-
-            case TRANSFER:
-                if (createTransaction.getEmail() == null || createTransaction.getEmail().isEmpty()) {
-                    throw new RuntimeException("Recipient email is required for transfer");
+        @Override
+        @Transactional
+        @SuppressWarnings("rawtypes")
+        public CommonResponse createTransaction(User user, CreateTransaction createTransaction) {
+                if (createTransaction.getTransactionEnum() == null) {
+                        throw new RuntimeException("Transaction type is required");
                 }
-                
-                if (user.getEmail().equals( createTransaction.getEmail())) {
-                    throw new RuntimeException("Cannot sending to the same account");
+
+                if (createTransaction.getAmount() == null || createTransaction.getAmount().signum() <= 0) {
+                        throw new RuntimeException("Amount must be greater than zero");
                 }
-                User recipientUser = userRepository.findByEmail(createTransaction.getEmail())
-                        .orElseThrow(() -> new RuntimeException("Recipient not found with email: " + createTransaction.getEmail()));
-                
-                transaction = Transaction.builder()
-                        .accountFromId(user.getId())
-                        .accountToId(recipientUser.getId())
-                        .transactionType(TransactionEnum.TRANSFER)
-                        .amount(createTransaction.getAmount())
-                        .build();
-                break;
-            default:
-                throw new RuntimeException("Invalid transaction type");
+
+                Transaction transaction;
+                switch (createTransaction.getTransactionEnum()) {
+                        case DEPOSIT:
+                                transaction = Transaction.builder()
+                                                .accountFromId(user.getId())
+                                                .accountToId(null)
+                                                .transactionType(TransactionEnum.DEPOSIT)
+                                                .amount(createTransaction.getAmount())
+                                                .build();
+                                break;
+
+                        case WITHDRAW:
+                                transaction = Transaction.builder()
+                                                .accountFromId(user.getId())
+                                                .accountToId(null)
+                                                .transactionType(TransactionEnum.WITHDRAW)
+                                                .amount(createTransaction.getAmount())
+                                                .build();
+                                break;
+
+                        case TRANSFER:
+                                if (createTransaction.getEmail() == null || createTransaction.getEmail().isEmpty()) {
+                                        throw new RuntimeException("Recipient email is required for transfer");
+                                }
+
+                                if (user.getEmail().equals(createTransaction.getEmail())) {
+                                        throw new RuntimeException("Cannot sending to the same account");
+                                }
+                                User recipientUser = userRepository.findByEmail(createTransaction.getEmail())
+                                                .orElseThrow(() -> new RuntimeException(
+                                                                "Recipient not found with email: "
+                                                                                + createTransaction.getEmail()));
+
+                                transaction = Transaction.builder()
+                                                .accountFromId(user.getId())
+                                                .accountToId(recipientUser.getId())
+                                                .transactionType(TransactionEnum.TRANSFER)
+                                                .amount(createTransaction.getAmount())
+                                                .build();
+                                break;
+                        default:
+                                throw new RuntimeException("Invalid transaction type");
+                }
+                transactionRepository.save(transaction);
+                return CommonResponse.builder()
+                                .message("Transaction created successfully")
+                                .data(List.of())
+                                .build();
         }
-        transactionRepository.save(transaction);
-        return CommonResponse.builder()
-                .message("Transaction created successfully")
-                .data(List.of())
-                .build();
-    }
 }
