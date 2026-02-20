@@ -109,20 +109,18 @@ async function onSubmit(event: FormSubmitEvent<SignupForm>) {
       username: event.data.username,
     };
 
-    const { data } = await useAsyncData(API_AUTH_SIGNUP, () =>
-      $api<JwtResponse>(API_AUTH_SIGNUP, {
+    const data = await  $api<JwtResponse>(API_AUTH_SIGNUP, {
         method: "POST",
         body: body,
-      }),
-    );
+      })
 
-    if (data.value) {
+    if (data) {
       const accessToken = useCookie<string>("access_token", {
         maxAge: 60 * 60 * 24, 
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       });
-      accessToken.value = data.value.accessToken;
+      accessToken.value = data.accessToken;
     }
 
 

@@ -1,8 +1,8 @@
 <template>
   <div class="w-full max-w-md mx-auto">
     <FormHeaderUi
-      title="Welcome Back"
-      subtitle="Sign in to your account to continue"
+      title="Create Transaction"
+      subtitle="Create Transaction base on transaction type"
     />
 
     <UForm
@@ -37,6 +37,7 @@
           v-model="formState.amount"
           label="Amount"
           placeholder="Entered your amount"
+          icon="mdi-light-alarm-panel"
           name="amount"
           required
         />
