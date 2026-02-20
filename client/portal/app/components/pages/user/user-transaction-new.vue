@@ -9,12 +9,14 @@ import TransactionForms from "~/components/forms/transfer-forms.vue";
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
-        <template #right> </template>
+        <template #right>
+    
+        </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
-      <TransactionForms/>
+      <TransactionForms />
     </template>
   </UDashboardPanel>
 </template>
