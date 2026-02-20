@@ -57,6 +57,7 @@ import SubmitButtonUi from "../ui/submit-button-ui.vue";
 import FormHeaderUi from "../ui/form-header-ui.vue";
 import NumberInputUi from "../ui/number-input-ui.vue";
 import SelectInputUI from "../ui/select-input-ui.vue";
+import { FetchError } from "ofetch";
 
 import type { FormSubmitEvent, Form } from "@nuxt/ui";
 
@@ -112,7 +113,6 @@ async function onSubmit(event: FormSubmitEvent<CreateTransactionForm>) {
       email: event.data.email,
     };
 
-
     const response = await $api<CommonResponseMessage>(API_TRANSACTION, {
       method: "POST",
       body: body,
@@ -127,9 +127,15 @@ async function onSubmit(event: FormSubmitEvent<CreateTransactionForm>) {
 
     await navigateTo("/user/transaction");
   } catch (error) {
+    let message = "Something went wrong. Please try again.";
+
+    if (error instanceof FetchError) {
+      message = (error.data as any)?.message || error.statusMessage || message;
+    }
+
     toast.add({
-      title: "Sign In Failed",
-      description: "Invalid email or password. Please try again.",
+      title: "Transaction Failed",
+      description: message,
       color: "error",
       icon: "i-heroicons-x-circle",
     });

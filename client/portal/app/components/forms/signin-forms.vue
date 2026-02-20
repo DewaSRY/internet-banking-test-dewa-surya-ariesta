@@ -68,7 +68,6 @@ const isFormInvalid = computed<boolean>(() => {
 });
 
 async function onSubmit(event: FormSubmitEvent<SigninRequest>) {
-  console.log(event);
   isLoading.value = true;
 
   try {
@@ -77,31 +76,28 @@ async function onSubmit(event: FormSubmitEvent<SigninRequest>) {
       password: event.data.password,
     };
 
-    const { data } = await useAsyncData(API_AUTH_SIGNIN, () =>
-      $api<JwtResponse>(API_AUTH_SIGNIN, {
-        method: "POST",
-        body: body,
-      }),
-    );
+    const data = await $api<JwtResponse>(API_AUTH_SIGNIN, {
+      method: "POST",
+      body: body,
+    });
 
-    if (data.value) {
+    if (data) {
       const accessToken = useCookie<string>("access_token", {
         maxAge: 60 * 60 * 24,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       });
-      accessToken.value = data.value.accessToken;
+      accessToken.value = data.accessToken;
+
+      toast.add({
+        title: "Success!",
+        description: "Welcome back",
+        color: "success",
+        icon: "i-heroicons-check-circle",
+      });
+
+      await navigateTo("/user");
     }
-
-    toast.add({
-      title: "Success!",
-      description: "Welcome back",
-      color: "success",
-      icon: "i-heroicons-check-circle",
-    });
-
-    // handle navigate
-    await navigateTo("/user");
   } catch (error) {
     toast.add({
       title: "Sign In Failed",
