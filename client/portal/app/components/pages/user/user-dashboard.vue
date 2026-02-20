@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import TransactionProfileContainer from "~/components/container/transaction-profile-container.vue";
+</script>
 
 <template>
   <UDashboardPanel id="user-dashboard">
@@ -11,6 +13,8 @@
       </UDashboardNavbar>
     </template>
 
-    <template #body> user dashboard </template>
+    <template #body>
+      <TransactionProfileContainer />
+    </template>
   </UDashboardPanel>
 </template>
